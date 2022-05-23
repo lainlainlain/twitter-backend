@@ -2,6 +2,7 @@ import express from 'express';
 import { UserCtrl } from './controllers/UserController';
 import { registerValidations } from './validations/validator';
 import dotenv from 'dotenv';
+import './core/db';
 
 const app = express();
 
