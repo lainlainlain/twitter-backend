@@ -2,6 +2,7 @@ import { UserModel } from '../models/UserModel';
 import express from 'express';
 import { validationResult } from 'express-validator';
 import { generateMD5 } from '../utils/generateHash';
+import { sendEmail } from '../utils/sendMail';
 
 class UserController {
   async index(_: any, res: express.Response): Promise<void> {
@@ -13,7 +14,7 @@ class UserController {
         data: users,
       });
     } catch (error) {
-      res.json({
+      res.status(500).json({
         satus: 'error',
         message: JSON.stringify(error),
       });
@@ -33,7 +34,7 @@ class UserController {
         username: req.body.username,
         fullname: req.body.fullname,
         password: req.body.password,
-        confirm_hash: generateMD5(process.env.SECRET_KEY || Math.random().toString()),
+        confirmHash: generateMD5(process.env.SECRET_KEY || Math.random().toString()),
       };
 
       const user = await UserModel.create(data);
@@ -42,9 +43,69 @@ class UserController {
         status: 'success',
         data: user,
       });
+
+      sendEmail(
+        {
+          emailFrom: 'admin@twitter.com',
+          emailTo: data.email,
+          subject: 'Подтверждение почты Twitter Clone Tutorial',
+          html: `Для того, чтобы подтвердить почту, перейдите <a href="http://localhost:${
+            process.env.PORT || 8888
+          }/users/verify?hash=${data.confirmHash}">по этой ссылке</a>`,
+        },
+        (err: Error | null) => {
+          if (err) {
+            res.status(500).json({
+              status: 'error',
+              message: err,
+            });
+          } else {
+            res.status(201).json({
+              status: 'success',
+              data: user,
+            });
+          }
+        },
+      );
     } catch (error) {
       res.json({
         satus: 'error',
+        message: JSON.stringify(error),
+      });
+    }
+  }
+
+  async verify(req: express.Request, res: express.Response): Promise<void> {
+    try {
+      const hash = req.query.hash;
+
+      if (!hash) {
+        res.status(400).send();
+        return;
+      }
+
+      const user = await UserModel.findOne({ confirmHash: hash }).exec();
+
+      if (user) {
+        user.confirmed = true;
+        user.save();
+        res.json({
+          status: 'success',
+        });
+      } else {
+        res.status(404).json({
+          status: 'error',
+          message: 'User cant be found',
+        });
+      }
+
+      res.json({
+        status: 'success',
+        data: user,
+      });
+    } catch (error) {
+      res.json({
+        status: 'error',
         message: JSON.stringify(error),
       });
     }
