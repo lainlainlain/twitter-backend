@@ -1,5 +1,6 @@
 import { UserModel } from '../models/UserModel';
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import { generateMD5 } from '../utils/generateHash';
 import { sendEmail } from '../utils/sendMail';
@@ -130,6 +131,41 @@ class UserController {
         });
       }
 
+      res.json({
+        status: 'success',
+        data: user,
+      });
+    } catch (error) {
+      res.json({
+        status: 'error',
+        message: JSON.stringify(error),
+      });
+    }
+  }
+
+  async afterLogin(req: express.Request, res: express.Response): Promise<void> {
+    try {
+      const user = req.user ? (req.user as any).toJSON() : undefined;
+      res.json({
+        status: 'success',
+        data: {
+          ...user,
+          token: jwt.sign({ user: req.user }, process.env.SECRET_KEY || 'qwerty123', {
+            expiresIn: '30 days',
+          }),
+        },
+      });
+    } catch (error) {
+      res.json({
+        status: 'error',
+        message: JSON.stringify(error),
+      });
+    }
+  }
+
+  async getUserInfo(req: express.Request, res: express.Response): Promise<void> {
+    try {
+      const user = req.user ? (req.user as any).toJSON() : undefined;
       res.json({
         status: 'success',
         data: user,
