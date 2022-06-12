@@ -28,11 +28,16 @@ passport.use(
   new JWTstrategy(
     {
       secretOrKey: process.env.SECRET_KEY || 'QWETY',
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromHeader('token'),
     },
-    async (payload, done) => {
+    async (payload: { data: any }, done) => {
       try {
-        return done(null, payload.user);
+        const user = await UserModel.findById(payload.data._id).exec();
+        if (user) {
+          return done(null, user);
+        }
+
+        done(null, false);
       } catch (error) {
         done(error);
       }

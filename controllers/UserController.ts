@@ -83,7 +83,7 @@ class UserController {
           subject: 'Подтверждение почты Twitter Clone Tutorial',
           html: `Для того, чтобы подтвердить почту, перейдите <a href="http://localhost:${
             process.env.PORT || 8888
-          }/users/verify?hash=${data.confirmHash}">по этой ссылке</a>`,
+          }/auth/verify?hash=${data.confirmHash}">по этой ссылке</a>`,
         },
         (err: Error | null) => {
           if (err) {
@@ -150,7 +150,7 @@ class UserController {
         status: 'success',
         data: {
           ...user,
-          token: jwt.sign({ user: req.user }, process.env.SECRET_KEY || 'qwerty123', {
+          token: jwt.sign({ data: req.user }, process.env.SECRET_KEY || 'qwerty123', {
             expiresIn: '30 days',
           }),
         },
