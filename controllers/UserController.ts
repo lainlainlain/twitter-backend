@@ -4,9 +4,7 @@ import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import { generateMD5 } from '../utils/generateHash';
 import { sendEmail } from '../utils/sendMail';
-const mongoose = require('mongoose');
-
-const isValidObjectId = mongoose.Types.ObjectId.isValid;
+import { isValidObjectId } from '../utils/isValidObject';
 
 class UserController {
   async index(_: any, res: express.Response): Promise<void> {

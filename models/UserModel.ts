@@ -1,5 +1,19 @@
 import { model, Schema } from 'mongoose';
 
+export interface UserModelInterface {
+  _id?: string;
+  email: string;
+  fullname: string;
+  username: string;
+  password: string;
+  confirmHash: string;
+  confirmed?: boolean;
+  location?: string;
+  about?: string;
+  website?: string;
+  tweets?: string[];
+}
+
 const UserSchema = new Schema({
   email: {
     unique: true,
