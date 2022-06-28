@@ -80,7 +80,6 @@ class TweetsController {
       });
     }
   }
-
   async delete(req: express.Request, res: express.Response): Promise<void> {
     const user = req.user as UserModelInterface;
 
@@ -98,6 +97,41 @@ class TweetsController {
         if (tweet) {
           if (String(tweet.user._id) === String(user._id)) {
             tweet.remove();
+            res.send();
+          } else {
+            res.status(403).send();
+          }
+        } else {
+          res.status(404).send();
+        }
+      }
+    } catch (error) {
+      res.status(500).json({
+        status: 'error',
+        message: error,
+      });
+    }
+  }
+
+  async update(req: express.Request, res: express.Response): Promise<void> {
+    const user = req.user as UserModelInterface;
+
+    try {
+      if (user) {
+        const tweetId = req.params.id;
+
+        if (!isValidObjectId(tweetId)) {
+          res.status(400).send();
+          return;
+        }
+
+        const tweet = await TweetModel.findById(tweetId);
+
+        if (tweet) {
+          if (String(tweet.user._id) === String(user._id)) {
+            const text = req.body.text;
+            tweet.text = text;
+            tweet.save();
             res.send();
           } else {
             res.status(403).send();

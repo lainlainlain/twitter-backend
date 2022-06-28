@@ -6,17 +6,22 @@ export interface TweetModelInterface {
   user: string;
 }
 
-const TweetSchema = new Schema({
-  text: {
-    required: true,
-    type: String,
-    maxlength: 280,
+const TweetSchema = new Schema(
+  {
+    text: {
+      required: true,
+      type: String,
+      maxlength: 280,
+    },
+    user: {
+      required: true,
+      ref: 'User',
+      type: Schema.Types.ObjectId,
+    },
   },
-  user: {
-    required: true,
-    ref: 'User',
-    type: Schema.Types.ObjectId,
+  {
+    timestamps: true,
   },
-});
+);
 
 export const TweetModel = model('Tweet', TweetSchema);
