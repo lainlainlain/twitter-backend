@@ -1,8 +1,8 @@
-import { TweetModel, TweetModelInterface } from '../models/TweetModel';
-import express from 'express';
-import { isValidObjectId } from '../utils/isValidObject';
-import { validationResult } from 'express-validator';
-import { UserModelInterface } from '../models/UserModel';
+import { TweetModel } from "../models/TweetModel";
+import express from "express";
+import { isValidObjectId } from "../utils/isValidObject";
+import { validationResult } from "express-validator";
+import { UserModelInterface } from "../models/UserModel";
 
 class TweetsController {
   async index(_: any, res: express.Response): Promise<void> {
@@ -10,12 +10,12 @@ class TweetsController {
       const tweets = await TweetModel.find({}).exec();
 
       res.json({
-        status: 'success',
+        status: "success",
         data: tweets,
       });
     } catch (error) {
       res.json({
-        status: 'error',
+        status: "error",
         message: JSON.stringify(error),
       });
     }
@@ -38,12 +38,12 @@ class TweetsController {
       }
 
       res.json({
-        status: 'success',
+        status: "success",
         data: tweet,
       });
     } catch (error) {
       res.status(500).json({
-        status: 'error',
+        status: "error",
         message: error,
       });
     }
@@ -57,11 +57,11 @@ class TweetsController {
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
-          res.status(400).json({ status: 'error', errors: errors.array() });
+          res.status(400).json({ status: "error", errors: errors.array() });
           return;
         }
 
-        const data: TweetModelInterface = {
+        const data: any = {
           text: req.body.text,
           user: user._id,
         };
@@ -69,13 +69,13 @@ class TweetsController {
         const tweet = await TweetModel.create(data);
 
         res.json({
-          status: 'success',
-          data: tweet,
+          status: "success",
+          data: await tweet.populate("user").execPopulate(),
         });
       }
     } catch (error) {
       res.status(500).json({
-        status: 'error',
+        status: "error",
         message: error,
       });
     }
@@ -107,7 +107,7 @@ class TweetsController {
       }
     } catch (error) {
       res.status(500).json({
-        status: 'error',
+        status: "error",
         message: error,
       });
     }
@@ -142,7 +142,7 @@ class TweetsController {
       }
     } catch (error) {
       res.status(500).json({
-        status: 'error',
+        status: "error",
         message: error,
       });
     }
