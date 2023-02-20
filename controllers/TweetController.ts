@@ -64,6 +64,7 @@ class TweetsController {
         const data: any = {
           text: req.body.text,
           user: user._id,
+          images: req.body.images,
         };
 
         const tweet = await TweetModel.create(data);

@@ -35,7 +35,7 @@ app.get('/auth/verify', registerValidations, UserCtrl.verify);
 app.post('/auth/register', registerValidations, UserCtrl.create);
 app.post('/auth/login', passport.authenticate('local'), UserCtrl.afterLogin);
 
-app.post('/upload', upload.single('avatar'), UploadFileCtrl.upload);
+app.post('/upload', upload.single('image'), UploadFileCtrl.upload);
 
 app.listen(8888, (): void => {
   console.log('SERVER IS RUNNING');
