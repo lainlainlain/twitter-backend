@@ -49,6 +49,34 @@ class TweetsController {
     }
   }
 
+  async getUserTweets(req: express.Request, res: express.Response): Promise<void> {
+    try {
+      const userId = req.params.id;
+
+      if (!isValidObjectId(userId)) {
+        res.status(400).send();
+        return;
+      }
+
+      const tweet = await TweetModel.find({ user: userId }).populate('user').exec();
+
+      if (!tweet) {
+        res.status(404).send();
+        return;
+      }
+
+      res.json({
+        status: 'success',
+        data: tweet,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 'error',
+        message: error,
+      });
+    }
+  }
+
   async create(req: express.Request, res: express.Response): Promise<void> {
     try {
       const user = req.user as UserModelInterface;
@@ -68,6 +96,10 @@ class TweetsController {
         };
 
         const tweet = await TweetModel.create(data);
+
+        if (user.tweets) {
+          user.tweets.push(user._id);
+        }
 
         res.json({
           status: 'success',
